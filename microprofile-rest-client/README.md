@@ -17,7 +17,7 @@ mvn clean package
 
 ### Deploy
 ```
-cp ./service/target//microprofile-rest-client-service.war ${WILDFLY_HOME}/standalone/deployments/.
+cp ./service/target/microprofile-rest-client-service.war ${WILDFLY_HOME}/standalone/deployments/.
 cp ./client/target/microprofile-rest-client-client.war ${WILDFLY_HOME}/standalone/deployments/.
 ${WILDFLY_HOME}/bin/standalone.sh
 ``` 
