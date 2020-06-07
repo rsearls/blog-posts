@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+
+   <context-param>
+      <param-name>courts</param-name>
+      <param-value>legal-courts</param-value>
+   </context-param>
+
+   <context-param>
+      <param-name>month</param-name>
+      <param-value>April</param-value>
+   </context-param>
+
+   <servlet>
+      <display-name>jaxrs-ONE</display-name>
+      <servlet-name>jaxrs</servlet-name>
+      <servlet-class>org.jboss.rest.config.one.ServiceActivator</servlet-class>
+      <init-param>
+         <param-name>resteasy.servlet.mapping.prefix</param-name>
+         <param-value>/</param-value>
+      </init-param>
+   </servlet>
+   <servlet-mapping>
+      <servlet-name>jaxrs</servlet-name>
+      <url-pattern>/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
+      <servlet-name>Resteasy</servlet-name>
+      <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>Resteasy</servlet-name>
+      <url-pattern>/rest/*</url-pattern>
+   </servlet-mapping>
+
+   <filter>
+      <filter-name>Aquarium-Filter</filter-name>
+      <filter-class>org.jboss.rest.filter.AquariumFilter</filter-class>
+      <init-param>
+         <param-name>javax.ws.rs.Application</param-name>
+         <param-value>org.jboss.rest.config.one.ServiceActivator</param-value>
+      </init-param>
+      <init-param>
+         <param-name>company</param-name>
+         <param-value>AquaLand</param-value>
+      </init-param>
+      <init-param>
+         <param-name>filter-type</param-name>
+         <param-value>saltwater</param-value>
+      </init-param>
+   </filter>
+
+   <filter-mapping>
+      <filter-name>Aquarium-Filter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+<!--
+   <filter>
+      <filter-name>Car-Filter</filter-name>
+      <filter-class>org.jboss.rest.filter.CarFilter</filter-class>
+      <init-param>
+         <param-name>javax.ws.rs.Application</param-name>
+         <param-value>org.jboss.rest.config.one.ServiceActivator</param-value>
+      </init-param>
+      <init-param>
+         <param-name>filter-provider</param-name>
+         <param-value>Filters-and-More</param-value>
+      </init-param>
+   </filter>
+
+   <filter-mapping>
+      <filter-name>Car-Filter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+-->
+
+   <filter>
+      <filter-name>FilterName</filter-name>
+      <filter-class>org.jboss.resteasy.plugins.server.servlet.FilterDispatcher</filter-class>
+      <init-param>
+         <param-name>javax.ws.rs.Application</param-name>
+         <param-value>org.jboss.rest.config.one.ServiceActivator</param-value>
+      </init-param>
+      <init-param>
+         <param-name>system</param-name>
+         <param-value>system-filter</param-value>
+      </init-param>
+      <init-param>
+         <param-name>init</param-name>
+         <param-value>init-filter</param-value>
+      </init-param>
+      <init-param>
+         <param-name>filter</param-name>
+         <param-value>filter-filter</param-value>
+      </init-param>
+   </filter>
+
+   <filter-mapping>
+      <filter-name>FilterName</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+
+</web-app>

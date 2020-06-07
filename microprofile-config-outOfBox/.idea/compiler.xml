@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="childJar" />
+        <module name="microprofile-config-one" />
+        <module name="microprofile-config-three" />
+        <module name="microprofile-config-four" />
+        <module name="altChildJar" />
+        <module name="microprofile-config-five" />
+        <module name="microprofile-config-two" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="altChildJar" target="1.8" />
+      <module name="childJar" target="1.8" />
+      <module name="microprofile-config-five" target="1.8" />
+      <module name="microprofile-config-four" target="1.8" />
+      <module name="microprofile-config-one" target="1.8" />
+      <module name="microprofile-config-outOfBox" target="1.8" />
+      <module name="microprofile-config-three" target="1.8" />
+      <module name="microprofile-config-two" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="altChildJar" options="-endorseddirs $PROJECT_DIR$/altChildJar/target/endorsed" />
+      <module name="childJar" options="-endorseddirs $PROJECT_DIR$/childJar/target/endorsed" />
+      <module name="microprofile-config-five" options="-endorseddirs $PROJECT_DIR$/five/target/endorsed" />
+      <module name="microprofile-config-four" options="-endorseddirs $PROJECT_DIR$/four/target/endorsed" />
+      <module name="microprofile-config-one" options="-endorseddirs $PROJECT_DIR$/one/target/endorsed" />
+      <module name="microprofile-config-three" options="-endorseddirs $PROJECT_DIR$/three/target/endorsed" />
+      <module name="microprofile-config-two" options="-endorseddirs $PROJECT_DIR$/two/target/endorsed" />
+    </option>
+  </component>
+</project>

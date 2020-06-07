@@ -1,0 +1,214 @@
+
+In this article I will discuss the out-of-the-box ConfigSources
+the MP-Config specification mandates every implementor provide.
+I will show how these ConfigSources can be used to customized
+the configuration of a simple REST application that runs in Wildlfy,
+and discuss some of the nuances in their use.
+
+
+Lets see the minimum set of ConfigSources provided by Wildfly for a REST application.
+Smallrye provides Wildfly's Microprofile-Config implementation.
+
+Run command
+
+curl http://localhost:8080/microprofile-config-one/one/provider/list
+curl http://localhost:8080/microprofile-config-two/two/provider/list
+
+Ordinal   Name
+400   SysPropConfigSource
+300   EnvConfigSource
+60   null:null:ServletConfigSource
+50   null:null:FilterConfigSource
+40   null:ServletContextConfigSource
+
+The specification requires that each ConfigSource provide a name and an ordinal.
+The ordinal designates the priority of the ConfigSource. Higher ordinals have
+priority over lower ordinals, Properties in higher priority ConfigSources
+override the identical property (key) of a lower priority ConfigSource.
+
+--- Side Note
+What is the highest possible ordinal?  It is Integer.MAX_VALUE, 2147483647,
+so registering a ConfigSource with ordinal 2147483647 will always be the
+top of the priority list.  However this would not be "best practice". It
+would most likely break a lot of stuff and cause your colleagues to yell
+WTF or worse.
+
+What happens if I set my ConfigSource ordinal to (Integer.MAX_VALUE + 1)?  A
+java.lang.NumberFormatException will be thrown.
+
+Which ConfigSource takes precedence if 2 or more have the same ordinal?
+It is indeterminate.  The specification makes no statement about it.
+This is not an issue until there is a name collision of a property name.
+The first encounter name in the list ConfigSources takes precedence.
+
+Debugging why a particular property value is not applied could present a
+challenge for the user.  Any number of third party ConfigSources can be
+added to the core set provided in an execution environment.  This increases
+the potential for name collision.  Currently there are no common tools for
+determining the set of ConfigSources and their ordinal in a given environment,
+or general rules for documenting this information.  At this time tt is left
+to the user to develop a process and/or tools to ferret out this information.
+--- Side Note end
+
+ConfigSource names have no required format. Wildfly chooses to use the class name.
+
+The first 2 ConfigSources in the list are required by the specification,
+One for retrieving system properties with a default ordinal of 400 and the other
+for Environment variables with a default ordinal of 300. They are
+SysPropConfigSource and EnvConfigSource respectively in Wildfly.
+
+The specification implementors may assign different ordinals to their
+implementation's of these two ConfigSources.
+
+The following 3 ConfigSources are provided by RESTEasy.  They are used to
+retrieved properties from the web.xml file. ServletConfigSource contains
+properties from the <servlet> element. FilterConfigSource from the
+<filter> element and ServletContextConfigSource from <servlet-context>
+elements.  Notice the low ordinal for these.  These ConfigSources will
+be discussed in more detail shortly.
+
+What is the "null:" in the names of RESTEasy's ConfigSources?  Is this programmer
+error?  It is not an error.  It is the implementors choice to use "null" as the
+placeholder for the name attribute of the web element, when the attribute is not used.
+":" is a separator between the name of a parent element and current element.
+??? todo more research ... what should "null" be returning ...
+The intended name format for each is
+  servletContext.getServletContextName():servletConfig.getServletName():ServletConfigSource
+  servletContext.getServletContextName():filterConfig.getFilterName():FilterConfigSource
+  servletContext.getServletContextName():ServletContextConfigSource
+
+curl -v http://localhost:8080/microprofile-config-one/demo/ServletConfigSource/properties
+
+60   null:null:ServletConfigSource
+	 resteasy.servlet.mapping.prefix : /
+	 javax.ws.rs.Application : org.jboss.rest.config.one.ServiceActivator
+
+curl -v http://localhost:8080/microprofile-config-one/demo/FilterConfigSource/properties
+
+50   null:null:FilterConfigSource
+	 no entries
+
+curl -v http://localhost:8080/microprofile-config-one/demo/ServletContextConfigSource/properties
+
+40   null:ServletContextConfigSource
+	 resteasy.preferJacksonOverJsonB : false
+	 resteasy.scanned.resources : org.jboss.rest.config.one.DemoResource
+	 resteasy.document.expand.entity.references : false
+	 resteasy.unwrapped.exceptions : javax.ejb.EJBException
+
+---------------
+javax.ws.rs.Application : org.jboss.rest.config.one.ServiceActivator
+org.jboss.rest.alt.config.AlternateApp
+
+Stop wildfly.
+Start wildfly with cmd-line addition -Dresteasy.preferJacksonOverJsonB=TRUE
+Environment variable override value..  ?? how show up in this
+    ServletContextConfigSource properties file?? Why not show in EnvConfigSource
+-Dresteasy.preferJacksonOverJsonB=TRUE
+
+curl -v http://localhost:8080/microprofile-config-one/demo/ServletContextConfigSource/properties
+40   null:ServletContextConfigSource
+	 resteasy.preferJacksonOverJsonB : TRUE
+	 resteasy.scanned.resources : org.jboss.rest.config.one.DemoResource
+	 resteasy.document.expand.entity.references : false
+	 resteasy.unwrapped.exceptions : javax.ejb.EJBException
+----
+Stop wildfly.
+export resteasy.preferJacksonOverJsonB=TruE
+Start wildfly  ./bin/standalone.sh
+SysPropConfigSource set as system property
+We can't test this as a system property because (bash) unix does not
+support the "." character in the identifier.
+
+----
+add properties file to the WEB app
+META-INF/microprofile-config.properties file
+    contents
+            resteasy.preferJacksonOverJsonB=TruE
+
+ curl -v http://localhost:8080/microprofile-config-one/demo/lookup/resteasy.preferJacksonOverJsonB
+
+100  PropertiesConfigSource[source=vfs:/content/microprofile-config-one.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+	 resteasy.preferJacksonOverJsonB : TruE
+40   null:ServletContextConfigSource
+	 resteasy.preferJacksonOverJsonB : false
+
+curl -v http://localhost:8080/microprofile-config-one/demo/provider/list
+Ordinal   Name
+400   SysPropConfigSource
+300   EnvConfigSource
+100   PropertiesConfigSource[source=vfs:/content/microprofile-config-one.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+60   null:null:ServletConfigSource
+50   null:null:FilterConfigSource
+40   null:ServletContextConfigSource
+
+There are 2 interesting points to note.  One, a new ConfigSource, PropertiesConfigSource,
+has been added.  It was added when the microprofile-config.properties file was found by
+Wildfly.  Because microprofile-config.properties is a standard component in the specification,
+bla-bla-bla
+
+
+Its default ordinal is 100. .... bla-bla
+
+----
+The specification states
+    "A ConfigSource for each property file META-INF/microprofile-config.properties
+     found on theclasspath."
+
+Its interesting that information about the specific properties files is maintained
+by this ConfigSource.
+
+Is it possible to have more than one microprofile-config.properties in a WEB archive?
+No it is not. Only 1 microprofile-config.properties can exist in the directory.
+
+Can I include a JAR file in the WAR with just a properties file?
+Will that file be found and processes?
+config_ordinal = 95
+curl -v http://localhost:8080/microprofile-config-one/demo/provider/list
+
+Ordinal   Name
+400   SysPropConfigSource
+300   EnvConfigSource
+100   PropertiesConfigSource[source=vfs:/content/microprofile-config-one.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+95   PropertiesConfigSource[source=vfs:/content/microprofile-config-one.war/WEB-INF/lib/jarFile-1.0.jar/META-INF/microprofile-config.properties]
+60   null:null:ServletConfigSource
+50   null:null:FilterConfigSource
+40   null:ServletContextConfigSource
+
+ curl -v http://localhost:8080/microprofile-config-one/demo/lookup/resteasy.preferJacksonOverJsonB
+ Ordinal   Name
+ 100   PropertiesConfigSource[source=vfs:/content/microprofile-config-one.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+ 	 resteasy.preferJacksonOverJsonB : TruE
+ 95   PropertiesConfigSource[source=vfs:/content/microprofile-config-one.war/WEB-INF/lib/jarFile-1.0.jar/META-INF/microprofile-config.properties]
+ 	 resteasy.preferJacksonOverJsonB : MayBe
+ 40   null:ServletContextConfigSource
+ 	 resteasy.preferJacksonOverJsonB : false
+
+
+ curl -v http://localhost:8080/microprofile-config-one/demo/get/resteasy.preferJacksonOverJsonB
+-----
+what if I want to unset a property value
+Can I just define the property as, resteasy.preferJacksonOverJsonB=
+what if resteasy.preferJacksonOverJsonB=""
+--
+How are property values with spaces handled
+resteasy.preferJacksonOverJsonB=My Very Educated Mother
+
+##config_ordinal = 95
+
+
+
+--------------------
+In an archive these 2 locations are looked at for the properties file.
+META-INF/microprofile-config.properties
+WEB-INF/classes/META-INF/microprofile-config.properties
+
+
+
+
+
+
+
+
+
+

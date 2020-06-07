@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/altChildJar/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/altChildJar/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/childJar/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/childJar/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/five/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/five/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/four/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/four/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/one/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/one/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/three/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/three/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/two/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/two/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
