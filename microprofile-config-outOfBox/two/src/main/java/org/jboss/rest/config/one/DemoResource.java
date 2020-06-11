@@ -27,7 +27,28 @@ public class DemoResource {
         );
         return sb.toString();
     }
-
+    
+    /**
+     * Display just the set of RESTEasy ConfigSources and their contents.
+     * @return
+     */
+    @GET
+    @Path("/report")
+    public String resport() {
+        Iterable<ConfigSource> itConfigSrcs = ConfigProvider.getConfig()
+                .getConfigSources();
+        StringBuilder sb = new StringBuilder();
+        // Display all registered ConfigProviders by name and ordinal
+        sb.append(String.format("%s   %s\n","Ordinal","Name"));
+        for (ConfigSource src : itConfigSrcs) {
+            if (!src.getName().contains("SysPropConfigSource") &&
+                    !src.getName().contains("EnvConfigSource")) {
+                sb.append(String.format("%s   %s\n", src.getOrdinal(), src.getName()));
+                getProperties(sb, src.getProperties());
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * Display all the key/value properties for the specified ConfigSource.

@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/altChildJar/altChildJar.iml" filepath="$PROJECT_DIR$/altChildJar/altChildJar.iml" />
       <module fileurl="file://$PROJECT_DIR$/childJar/childJar.iml" filepath="$PROJECT_DIR$/childJar/childJar.iml" />
-      <module fileurl="file://$PROJECT_DIR$/five/microprofile-config-five.iml" filepath="$PROJECT_DIR$/five/microprofile-config-five.iml" />
       <module fileurl="file://$PROJECT_DIR$/four/microprofile-config-four.iml" filepath="$PROJECT_DIR$/four/microprofile-config-four.iml" />
       <module fileurl="file://$PROJECT_DIR$/one/microprofile-config-one.iml" filepath="$PROJECT_DIR$/one/microprofile-config-one.iml" />
       <module fileurl="file://$PROJECT_DIR$/microprofile-config-outOfBox.iml" filepath="$PROJECT_DIR$/microprofile-config-outOfBox.iml" />

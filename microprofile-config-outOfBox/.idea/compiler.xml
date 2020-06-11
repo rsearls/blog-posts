@@ -10,8 +10,6 @@
         <module name="microprofile-config-one" />
         <module name="microprofile-config-three" />
         <module name="microprofile-config-four" />
-        <module name="altChildJar" />
-        <module name="microprofile-config-five" />
         <module name="microprofile-config-two" />
       </profile>
     </annotationProcessing>

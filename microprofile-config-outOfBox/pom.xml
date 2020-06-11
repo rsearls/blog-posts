@@ -83,12 +83,10 @@
             </activation>
             <modules>
                 <module>childJar</module>
-                <module>altChildJar</module>
                 <module>one</module>
                 <module>two</module>
                 <module>three</module>
                 <module>four</module>
-                <module>five</module>
             </modules>
         </profile>
     </profiles>
