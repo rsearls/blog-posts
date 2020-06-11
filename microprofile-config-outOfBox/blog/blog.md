@@ -39,8 +39,8 @@ externally are handled. WAR file microprofile-config-one.war in project
 module one uses only the minimal set of configuration options.  Module two
 adds a microprofile-config.properties file to the base application.
 Module three adds a third party JAR containing a microprofile-config.properties
-file.  Module four uses a web.xml for configuration.  A servlet and filter
-are provided in this module.
+file.  Module four uses a web.xml for configuration and adds two filters to
+the application.
 
 ### Resource Class
 Here is the skeleton of the REST resource that is used in this discussion. 
@@ -154,19 +154,19 @@ servlet declarations, filter declarations and application
 low ordinals, 60, 50, and 40.  Notice that these ordinals reflect the order
 of precedence defined by the Servlet specification for web.xml data.  Configuration
 data set in sevlet and filter elements takes precedence over the context parameters
-set in the web-app element.  An instance of each of these 3 ConfigSources
+set in the web-app element.  An instance of each of these three ConfigSources
 is always assigned to a running servlet.  When there is no configuration data
 for one of these ConfigSources, the instance is present but empty.
 
 
-> SideNote
+> Side Note
 >````
 >What is the highest possible ordinal?  
 >
 >It is Integer.MAX_VALUE, 2147483647. Registering a ConfigSource with ordinal
 >2147483647 will always be the top of the priority list, however this would 
->not be "best practice". It would most likely break a lot of stuff and 
->cause your colleagues to yell WTF or worse.
+>not be "best practice". It would likely break a lot of stuff and cause your
+>colleagues to yell WTF or worse.
 >````
 
 >````
@@ -179,15 +179,14 @@ for one of these ConfigSources, the instance is present but empty.
 >Which ConfigSource takes precedence if 2 or more have the same ordinal?
 >
 >It is indeterminate.  The specification makes no statement about it.
->This is not an issue until there is a name collision of a property name
->and ConfigSource instances with the same ordinal.  The first encountered
->name in the list of ConfigSources takes precedence.
+>This is not an issue until there is a name collision of a property name.
+>The first encountered name in the list of ConfigSources takes precedence.
 >````
 
 >```` 
 >Be aware the specification allows implementors to assign different ordinals for 
->SysPropConfigSource, EnvConfigSource and PropertiesConfigSource.  Other
->implementors may use different values.
+>SysPropConfigSource, EnvConfigSource and PropertiesConfigSource.  Other implementors
+>may use different values.
 >````
 
 >
@@ -236,7 +235,7 @@ which start with "resteasy." are [RESTEasy configuration switches](https://docs.
 No configuration data is declared in the web.xml for this applications.  These
 settings were added by Wildfly during the deployment process.  Notice property
 javax.ws.rs.Application in ServletConfigSource.  It's not a RESTEasy switch.
-RESTEasy will not perform a (configuration) lookup for property.  For all
+RESTEasy will not perform a (configuration) lookup for it.  For all
 intents and purposes it is a ready-only value.  There is no filter in the
 application, so FilterConfigSource is empty.
 
