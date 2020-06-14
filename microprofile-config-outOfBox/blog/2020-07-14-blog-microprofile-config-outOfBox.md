@@ -20,7 +20,7 @@ APIs to retrieve the information Wildfly's implementation of this specification 
 
 
 ### Requriements
-* Source code: [microprofile-config-outOfBox](https://github.com/rsearls/blog-posts/microprofile-config-outOfBox)
+* Source code: [microprofile-config-outOfBox](https://github.com/rsearls/blog-posts)
 * WildFly 19 or newer
 * maven
 * JDK 1.8 or newer
