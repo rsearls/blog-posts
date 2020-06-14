@@ -203,12 +203,111 @@ In an archive these 2 locations are looked at for the properties file.
 META-INF/microprofile-config.properties
 WEB-INF/classes/META-INF/microprofile-config.properties
 
+---------------
+how servlets and filters are handled
+    - filter to get init params from context or from Config? .. how that works
+    If they don't use config lookup ... no values will be overridden
+-- naming template  ConfigSources unnamed
+-- resteasy 3 ConfigSources
+-- One Servlet at a time (dispatcher)
+        may have multiple servlets defined in a web.xml but only
+        one running servlet ... will be accessible
+-- Default propreties ... why, who, assigns.  Different servers may provide
+        different defaults,  non-resteasy flags ... beware.
+-- duplcate param-names in the same section.  only one selected.
+
+----
+curl  http://localhost:8080/microprofile-config-five/org/five/report
+
+SmallRye Config is an implementation of Eclipse MicroProfile Config
+https://github.com/eclipse/microprofile-config/
+[SmallRye Config](https://smallrye.io/)
+
+------
+defines  an  easy  to  use  and  flexible  system  for  application  configuration.
+describes specific configuration requirements
+
+Historical Note
+When the Servlet specification was created one of the objectives was to define
+a mechanism to describe the specific configuration requirements of the application
+external to the source code, thus making it easier for the programmer to modify
+configuration settings. Web.xml is the result of that effort. The
+Microprofile-Configuration specification is a new layer of externalization
+of configuration data from the code and web.xml.
 
 
+---------------
+curl http://localhost:8080/microprofile-config-four/air/four/provider/list
+Ordinal   Name
+400   SysPropConfigSource
+300   EnvConfigSource
+60   null:DemoFour:ServletConfigSource
+50   null:null:FilterConfigSource
+45   PropertiesConfigSource[source=vfs:/content/microprofile-config-four.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+40   null:ServletContextConfigSource
 
+curl http://localhost:8080/microprofile-config-four/air/four/report
+Ordinal   Name
+60   null:DemoFour:ServletConfigSource
+	 no entries
+50   null:null:FilterConfigSource
+	 resteasy.servlet.mapping.prefix : /air
+	 javax.ws.rs.Application : org.jboss.rest.config.one.ServiceActivator
+	 aquarium : fish-filter
+45   PropertiesConfigSource[source=vfs:/content/microprofile-config-four.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+	 config_ordinal : 45
+	 farewell-phrase : that's all folks
+40   null:ServletContextConfigSource
+	 resteasy.preferJacksonOverJsonB : false
+	 month : June
+	 courts : legal-courts
+	 resteasy.document.expand.entity.references : false
+	 resteasy.unwrapped.exceptions : javax.ejb.EJBException
 
+-----
+curl http://localhost:8080/microprofile-config-four/DemoFour/four/provider/list
+Ordinal   Name
+400   SysPropConfigSource
+300   EnvConfigSource
+60   null:DemoFour:ServletConfigSource
+50   null:null:FilterConfigSource
+45   PropertiesConfigSource[source=vfs:/content/microprofile-config-four.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+40   null:ServletContextConfigSource
 
+-- Thanks for asking --
 
+---
+curl http://localhost:8080/microprofile-config-four/four/report
+Ordinal   Name
+60   null:DemoFour:ServletConfigSource
+	 resteasy.servlet.mapping.prefix : /DemoFour
+	 javax.ws.rs.Application : org.jboss.rest.config.one.ServiceActivator
+50   null:null:FilterConfigSource
+	 no entries
+45   PropertiesConfigSource[source=vfs:/content/microprofile-config-four.war/WEB-INF/classes/META-INF/microprofile-config.properties]
+	 config_ordinal : 45
+	 farewell-phrase : that's all folks
+40   null:ServletContextConfigSource
+	 resteasy.preferJacksonOverJsonB : false
+	 month : June
+	 courts : legal-courts
+	 resteasy.document.expand.entity.references : false
+	 resteasy.unwrapped.exceptions : javax.ejb.EJBException
+
+-- Thanks for asking --
+
+------------
+
+curl http://localhost:8080/microprofile-config-four/air/lookup/aquarium
+
+curl http://localhost:8080/microprofile-config-four/air/four/lookup/aquarium
+Ordinal   Name
+400   SysPropConfigSource
+	 aquarium : Tropical Pets
+300   EnvConfigSource
+	 aquarium : tank equipment
+50   null:airFilter:FilterConfigSource
+	 aquarium : fish-filter
 
 
 
