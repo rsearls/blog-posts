@@ -3,18 +3,18 @@ layout:     post
 title:      "MicroProfile Config 1.3; Examination of The Out-Of-The-Box
 ConfigSources for a RESTEasy Application"
 subtitle:   ""
-date:       Jun 1, 2020 
+date:       Jun 14, 2020 
 author:     Rebecca Searls
 ---
 
-In this article I will examine the out-of-the-box ConfigSources the MicroProfile 
+In this article we will examine the out-of-the-box ConfigSources the MicroProfile 
 Configuration specification mandates every implementor provide and the three
 ConfigSources RESTEasy provides for each servlet and filter. I will show how these
 ConfigSources are used to customize the configuration of a simple REST
 application that runs in Wildlfy, and discuss some of the nuances in their use.
 
-I have created a simple REST application whose endpoints use Microprofile-Configuration's
-APIs to retrieve the information Wildfly's implementation of this spec maintains.
+I have created a REST application whose endpoints use Microprofile-Configuration's
+APIs to retrieve the information Wildfly's implementation of this specification provides.
 [SmallRye Config](https://smallrye.io/) is Wildfly's implementation of 
 [Eclipse MicroProfile Config](https://github.com/eclipse/microprofile-config/).
 
@@ -28,11 +28,11 @@ APIs to retrieve the information Wildfly's implementation of this spec maintains
 >>
 >>I am using a unix environment.  This has not been tested on Windows.
 >>I will be running Wildfly and executing cURL commands in a terminal 
->>windows.
+>>window.
 >>
 
 The source code for this blog creates four nearly identical WAR files.
-Each WAR file has a small addition that shows different ConfigSources.
+Each WAR file has a small addition which will show different ConfigSources.
 This allows me to show you how an addition to an archive affects 
 the set of ConfigSources provided and how configuration properties set 
 externally are handled. WAR file microprofile-config-one.war in project 
@@ -124,48 +124,13 @@ ordinals have priority over lower ordinals. Properties in higher priority
 ConfigSources take precedence over properties in lower
 priority ConfigSources.
 
-There is no required format for ConfigSource names. 
-SmallRye chooses to use the class name.  RESTEasy uses a naming pattern.
-
-> Side Note
->>As of this writing there is an implementation issue being addressed for
->>RESTEsay ConfigSource names.  The pattern is as follows. 
->>The first "null" will be the "display-name" declared within element
->>"web-app" in the web.xml.  When no "display-name" is declared the
->>text "unnamed" will be used.  The second "null" is the "servlet-name"
->>for ServletConfigSources and "filter-name" for FilterConfigSource.
->>If no name is found "unnamed" will be used.
->
-
-The first 2 ConfigSources, SysPropConfigSource and EnvConfigSource are required
-by the specification. SysPropConfigSource is for retrieving system properties. Its ordinal 
-is 400.  EnvConfigSource is for retrieving Environment variables.  Its ordinal is 300.
-
-There is a third ConfigSource required by the specification not seen in this 
-list.  It is a ConfigSource for a microprofile-config.properties file.  In
-SmallRye its class name is PropertiesConfigSource.  Its default ordinal is 100.
-We will look at this one in module two.
-
-The next 3 ConfigSources, ServletConfigSource, FilterConfigSource and
-ServletContextConfigSource are RESTEasy specific.  They represent the
-three areas in a REST application in which RESTEasy supports external configuration,
-servlet declarations, filter declarations and application 
-"context-param" declarations respectively.  RESTEasy assigns these ConfigSources
-low ordinals, 60, 50, and 40.  Notice that these ordinals reflect the order
-of precedence defined by the Servlet specification for web.xml data.  Configuration
-data set in sevlet and filter elements takes precedence over the context parameters
-set in the web-app element.  An instance of each of these three ConfigSources
-is always assigned to a running servlet.  When there is no configuration data
-for one of these ConfigSources, the instance is present but empty.
-
-
 > Side Note
 >````
 >What is the highest possible ordinal?  
 >
 >It is Integer.MAX_VALUE, 2147483647. Registering a ConfigSource with ordinal
 >2147483647 will always be the top of the priority list, however this would 
->not be "best practice". It would likely break a lot of stuff and cause your
+>not be "best practice". It would likely break something and cause your
 >colleagues to yell WTF or worse.
 >````
 
@@ -191,6 +156,50 @@ for one of these ConfigSources, the instance is present but empty.
 
 >
 
+There is no required format for ConfigSource names. 
+SmallRye chooses to use the class name.  RESTEasy uses a naming pattern.
+
+> Side Note
+>>As of this writing there is an implementation issue being addressed for
+>>RESTEsay ConfigSource names.  The pattern is as follows. 
+>>The first "null" will be the "display-name" declared within element
+>>"web-app" in the web.xml.  When no "display-name" is declared the
+>>text "unnamed" will be used.  The second "null" is the "servlet-name"
+>>for ServletConfigSources and "filter-name" for FilterConfigSource.
+>>If no name is found "unnamed" will be used.
+>
+
+The first 2 ConfigSources, SysPropConfigSource and EnvConfigSource are required
+by the specification. SysPropConfigSource is for retrieving system properties. Its ordinal 
+is 400.  EnvConfigSource is for retrieving Environment variables.  Its ordinal is 300.
+
+There is a third ConfigSource required by the specification not seen in this 
+list.  It is a ConfigSource for a microprofile-config.properties file.  In
+SmallRye its class name is PropertiesConfigSource.  Its default ordinal is 100.
+We will look at that one in module two.
+
+The next 3 ConfigSources, ServletConfigSource, FilterConfigSource and
+ServletContextConfigSource are RESTEasy specific.  They represent the
+three areas in a REST application in which RESTEasy supports external configuration,
+servlet declarations, filter declarations and application "context-param" declarations 
+respectively.  RESTEasy assigns these ConfigSources low ordinals, 60, 50, and 40.  
+   
+An instance of each of these three ConfigSources
+is always assigned to a running servlet.  When there is no configuration data
+for one of these ConfigSources, the instance is present but empty.
+
+> Side Note
+>>The Servlet specification does not define an order of precedence among these three
+>>elements.  It defines three classes that implementations use to access the data in
+>>these elements.  This means there is no chance of confusion when there are duplicate
+>>"param-names" declared in any of these elements. This is not true for
+>>Microprofile-Configuration particularly when handling legacy EE applications.  For
+>>RESTEasy there is some potential for "param-name" collision between servlet, filter
+>>and context elements.
+>
+
+
+
 #### Inspect ConfigSources Contents 
 I will leave it to the reader to print the property list for SysPropConfigSource 
 and EnvConfigSource because the output for each is 100+ lines.  Here are the
@@ -210,7 +219,7 @@ curl http://localhost:8080/microprofile-config-one/one/EnvConfigSource/propertie
 >>of configuration data from the code and web.xml.
 >
 
-microprofile-config-one.war is the simplest possible REST application.
+microprofile-config-one.war is a simple REST application.
 The web.xml is empty; no configuration data is provided there.  The application
 runs with all the default configuration settings.  Lets see what those are.
 
@@ -239,8 +248,8 @@ RESTEasy will not perform a (configuration) lookup for it.  For all
 intents and purposes it is a ready-only value.  There is no filter in the
 application, so FilterConfigSource is empty.
 
-According to the specification I should be able to declare a higher precedent
-property for any of the properties in the ConfigSources.  Lets test it out.
+According to Microprofile-Configuration rules I should be able to declare a higher precedent
+property for any of the properties in the RESTEasy ConfigSources.  Lets test it out.
 
 I'm picking property resteasy.preferJacksonOverJsonB to change because
 it will not impact the running of this application.
@@ -337,7 +346,7 @@ curl http://localhost:8080/microprofile-config-two/two/get/resteasy.preferJackso
 TruE
 ````
 This is the expected value.  PropertiesConfigSource has a higher ordinal than
-ServletContextConfigSource, hence it is queried first.
+ServletContextConfigSource, hence it is found first.
 The key is found and its value returned to the caller.
 
 
@@ -354,7 +363,7 @@ microprofile-config.properties file with property, "resteasy.preferJacksonOverJs
 >>found on the classpath."
 >>
 
-Lets confirm it is true, that a PropertiesConfigSource instance
+Lets confirm that a PropertiesConfigSource instance
 is provided for each microprofile-config.properties file found
 in its classpath. 
 
@@ -466,9 +475,9 @@ is empty.  In RESTEasy one or the other of these ConfigSources will contain
 data but not both at the same time.
 
 
-Lets test one last thing.  I want to set a system variable and environment
+Lets run one last test.  I want to set a system variable and environment
 variable for filter parameter, aquarium, to show the properties are registered
-in those ConfigSources.
+in ConfigSources, SysPropConfigSource and EnvConfigSource.
 
 Stop Wildfly 
 Set the environment variable.
